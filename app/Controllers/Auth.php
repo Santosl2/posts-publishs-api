@@ -63,32 +63,59 @@ class Auth extends BaseController
         $input = $this->getRequestInput($this->request);
 
         if (!$input) {
-            return $this->getResponse(['MISSING_FIELDS' => 'Oops, está faltando alguns campos.'], ResponseInterface::HTTP_BAD_REQUEST);
+            return $this->getResponse(['error' => 'Oops, está faltando alguns campos.'], ResponseInterface::HTTP_OK);
         }
 
         if (!$this->validateRequest($input, $rules, $errors)) {
             return $this->getResponse(
                 $this->validator->getErrors(),
-                ResponseInterface::HTTP_BAD_REQUEST
+                ResponseInterface::HTTP_OK
             );
         }
 
         if ($this->session->token) {
-            return $this->getResponse(['NOT_FOUND' => 'Oops'], ResponseInterface::HTTP_NOT_FOUND);
+            return $this->getResponse(['error' => 'Oops'], ResponseInterface::HTTP_NOT_FOUND);
         }
 
         return $this->getJWT($input['email']);
     }
 
+    public function tryReconnect(){
+        
+        $rules = [
+            'token' => 'required'
+        ];
+
+        $input = $this->getRequestInput($this->request);
+
+        if (!$input) {
+            return $this->getResponse(['error' => 'Oops, está faltando alguns campos.'], ResponseInterface::HTTP_OK);
+        }
+
+        helper('jwt');
+        
+        // try reconnect
+        
+        
+    
+        $user = validateJWTFromRequest($input['token']);
+        unset($user['id'], $user['created_at'], $user['password']);
+        
+        $this->session->token = isset($this->session->token) 
+        ? $this->session->token : $input['token'];
+        
+        return json_encode($user);
+        
+        
+
+    }
 
     private function getJWT(string $email, int $responseCode = ResponseInterface::HTTP_OK)
     {
         try {
             $model = new UserModel();
             $user = $model->getUserByEmail($email);
-            unset($user['password']);
-            unset($user['id']);
-            unset($user['created_at']);
+            unset($user['id'], $user['created_at'], $user['password']);
 
             helper('jwt');
 
@@ -97,7 +124,7 @@ class Auth extends BaseController
             return $this
                 ->getResponse(
                     [
-                        'message' => 'Sucesso!',
+                        'message' => 'OK',
                         'user' => $user,
                         'access_token' => $token
                     ]
