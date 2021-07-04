@@ -18,14 +18,15 @@ class UserRules
         }
     }
 
-    public function verifyIsEqual(string $str, string $inputs, array $data){
-        $fields = explode(',', $inputs);
+    public function verifyIsEqual(string $str, string $inputs, array $data)
+    {
+        $fields = explode(',', str_replace(" ", "", $inputs));
 
-        foreach($data as $key => $value):
-            if($data[$fields[0]] != $data[$fields[1]]):
-                return false;
-            endif;
-        endforeach;
+
+        if ($data[$fields[0]] != $data[$fields[1]]) :
+            return false;
+        endif;
+
 
         return true;
     }

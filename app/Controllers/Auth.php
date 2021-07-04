@@ -19,11 +19,11 @@ class Auth extends BaseController
         ];
 
         $input = $this->getRequestInput($this->request);
-
+        
         if (!$this->validateRequest($input, $rules)) {
             return $this->getResponse(
                 $this->validator->getErrors(),
-                ResponseInterface::HTTP_BAD_REQUEST
+                ResponseInterface::HTTP_OK
             );
         }
 
@@ -94,7 +94,7 @@ class Auth extends BaseController
         $input = $this->getRequestInput($this->request);
 
         if (!$input) :
-            return $this->getResponse(['error' => 'Oops, está faltando alguns campos.'], ResponseInterface::HTTP_OK);
+            return $this->getResponse(['error' => 'Oops, está faltando alguns campos.'], ResponseInterface::HTTP_BAD_REQUEST);
         endif;
 
         helper('jwt');
