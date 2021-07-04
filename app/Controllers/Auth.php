@@ -69,7 +69,7 @@ class Auth extends BaseController
         if (!$this->validateRequest($input, $rules, $errors)) {
             return $this->getResponse(
                 $this->validator->getErrors(),
-                ResponseInterface::HTTP_OK
+                ResponseInterface::HTTP_BAD_REQUEST
             );
         }
 
