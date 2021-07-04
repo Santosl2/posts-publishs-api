@@ -7,7 +7,7 @@ return [
 	'groupNotFound'         => '{0} não é um grupo de regras de validação.',
 	'groupNotArray'         => 'O grupo de regras {0} deve ser um array.',
 	'invalidTemplate'       => '{0} não é um template de Validation válido.',
-
+	'verifyIsEqual'         => 'Senhas não se coincidem.',
 	// Rule Messages
 	'alpha'                 => 'O campo {field} pode conter apenas caracteres alfabéticos.',
 	'alpha_dash'            => 'O campo {field} pode conter apenas caracteres alfa-numéricos, sublinhados, e traços.',
