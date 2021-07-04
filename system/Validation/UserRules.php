@@ -17,4 +17,16 @@ class UserRules
             return false;
         }
     }
+
+    public function verifyIsEqual(string $str, string $inputs, array $data){
+        $fields = explode(',', $inputs);
+
+        foreach($data as $key => $value):
+            if($data[$fields[0]] != $data[$fields[1]]):
+                return false;
+            endif;
+        endforeach;
+
+        return true;
+    }
 }
