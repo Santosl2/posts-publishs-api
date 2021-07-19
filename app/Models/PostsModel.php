@@ -24,38 +24,15 @@ class PostsModel extends Model
      * Get all posts
      */
     public function getAll(){
-        $query = $this->adapter->query("SELECT p.id, p.content,
-         u.username, u.profileImg FROM posts p 
-        JOIN users u ON p.publishedBy = u.id");
+        $id = $this->user['id'];
+        $query = $this->adapter->query("SELECT 
+        p.id, p.content, u.username, u.profileImg, 
+        (SELECT COUNT(*) FROM posts_likes WHERE postId = p.id 
+        AND userId = $id) as voted 
+        FROM posts p JOIN users u ON p.publishedBy = u.id");
 
+        
         return json_encode($query->getResultArray());
-    }
-/**
- * verify posts exists
- */
-    private function postsExists(){
-        
-        $query = $this->adapter->query("SELECT COUNT(*) as numRows 
-        FROM posts WHERE id = $this->postId");
-       
-        $row = $query->getRow(1);
-        
-       return intval($row->numRows) > 0;
-        
-    }
-    /**
-     * Verify users liked the post
-     */
-    private function verifyLiked(){
-        $uId = $this->user['id'];
-        if($uId <= 0 || !$this->postsExists($this->postId)) return;
-
-        $query = $this->adapter->query("SELECT COUNT(*) as numRows FROM posts_likes
-        WHERE userId = $uId AND postId = $this->postId GROUP BY postId");
-
-        $row = $query->getRow(1);
-
-        return intval($row->numRows) > 0;
     }
 
     /**
@@ -65,18 +42,47 @@ class PostsModel extends Model
     public function postLike(){
         $uId = $this->user['id'];
         $pId = $this->postId;
-        
-        if($this->verifyLiked()){
+        if($this->verifyLiked()):
 
             $this->adapter->query("DELETE FROM posts_likes
              WHERE userId = $uId AND postId = $pId");
 
              return false;
-        }
+        endif;
 
         $this->adapter->query("INSERT INTO posts_likes (postId, userId) 
         VALUES ($pId, $uId)");
 
         return true;
     }
+    /**
+ * verify posts exists
+ */
+private function postsExists(){
+        
+    if($this->postId <= 0) return false;
+
+    $query = $this->adapter->query("SELECT COUNT(*) as numRows 
+    FROM posts WHERE id = $this->postId");
+   
+    $row = $query->getRow(1);
+    
+   return intval($row->numRows) > 0;
+    
+}
+/**
+ * Verify users liked the post
+ */
+private function verifyLiked(){
+    $uId = $this->user['id'];
+    if(!isset($uId) || !$this->postsExists($this->postId)) return;
+
+    $query = $this->adapter->query("SELECT COUNT(*) as numRows FROM posts_likes
+    WHERE userId = $uId AND postId = $this->postId GROUP BY postId");
+
+    $row = $query->getRow(1);
+
+    return intval($row->numRows) > 0;
+}
+
 }
