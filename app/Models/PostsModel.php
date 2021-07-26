@@ -23,16 +23,34 @@ class PostsModel extends Model
     /**
      * Get all posts
      */
-    public function getAll(){
+    public function getAll(int $page = 1, int $perPage = 4){
+
+        $show = (($page * $perPage) - $page ) ;
+        
         $id = $this->user['id'];
         $query = $this->adapter->query("SELECT 
         p.id, p.content, u.username, u.profileImg, 
         (SELECT COUNT(*) FROM posts_likes WHERE postId = p.id 
-        AND userId = $id) as voted 
-        FROM posts p JOIN users u ON p.publishedBy = u.id");
+        AND userId = $id) as voted,
+        (SELECT COUNT(*) FROM posts_likes WHERE postId = p.id) as countLikes
+        FROM posts p JOIN users u ON p.publishedBy = u.id ORDER by id DESC LIMIT $show, $perPage");
 
         
         return json_encode($query->getResultArray());
+    }
+
+    public function getPostLikes()
+    {
+        //if($id <= 0) return false;
+
+
+        $query = $this->adapter->query("SELECT COUNT(*) as likes FROM 
+        posts_likes WHERE postId = $this->postId");
+
+        
+        $row = $query->getRow(1);
+
+        return $row->likes;
     }
 
     /**

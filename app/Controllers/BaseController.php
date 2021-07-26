@@ -78,6 +78,16 @@ class BaseController extends Controller
 		}
 		return $input;
 	}
+	public function getRequest(IncomingRequest $request)
+	{
+		$input = $request->getGet();
+		if (empty($input)) {
+			//convert request body to associative array
+			$input = json_decode($request->getBody(), true);
+		}
+		return $input;
+	}
+
 
 	public function validateRequest($input, array $rules, array $messages = [])
 	{

@@ -9,9 +9,11 @@ class Posts extends BaseController
 {
     public function index()
     {
+        $results = $this->getRequest($this->request);
         $posts = new PostsModel();
 
-        echo $posts->getAll();
+        $results["page"] = $results["page"] ?? 0;
+        echo $posts->getAll($results["page"]);
     }
 
     public function likePost()
@@ -26,6 +28,9 @@ class Posts extends BaseController
 
         $model = new PostsModel($input["pId"]);
 
-        return json_encode(["success" => $model->postLike()]);
+        return json_encode([
+            "success" => $model->postLike(),
+            "likes" => $model->getPostLikes()
+        ]);
     }
 }
